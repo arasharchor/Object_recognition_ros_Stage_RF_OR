@@ -48,7 +48,7 @@ class RecognitionServer:
     Main server that reads a config file, builds an actionlib server, reads an ecto plasm and run it when
     the actionlib server is queried
     """
-    def __init__(self, ork_params):
+    def __init__(self, ork_params, action_name):
         # create the plasm that will run the detection
         self.plasm = create_plasm(ork_params)
         self.plasm.configure_all()
@@ -75,7 +75,10 @@ class RecognitionServer:
                 self.cropper = cell
 
         # actionlib stuff
-        self.server = actionlib.SimpleActionServer('recognize_objects', ObjectRecognitionAction, self.execute, False)
+        if action_name and action_name != '""':
+            self.server = actionlib.SimpleActionServer(action_name, ObjectRecognitionAction, self.execute, False)
+        else:
+            self.server = actionlib.SimpleActionServer('recognize_objects', ObjectRecognitionAction, self.execute, False)
         self.server.start()
         rospy.loginfo('ORK server started')
 

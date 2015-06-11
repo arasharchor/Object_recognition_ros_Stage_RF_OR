@@ -55,9 +55,14 @@ if __name__ == '__main__':
     # add a node name option
     def filter_node_name(node_name):
         return node_name
+    # add an action name option
+    def filter_action_name(action_name):
+        return action_name
     ros_group = parser.add_argument_group('ROS parameters')
     ros_group.add_argument('--node_name', help='The name for the node. If "", it is not run in a ROS node',
                        default='object_recognition', type=filter_node_name)
+    ros_group.add_argument('--action_name', help='The name for the action lib server. If "", it is the default name = recognize_object',
+                       default='recognize_objects', type=filter_action_name)
 
     # cleanup the arguments
     clean_args = sys.argv
@@ -68,9 +73,14 @@ if __name__ == '__main__':
         rospy.loginfo('ORK server started with name: %s' % args.node_name)
         ecto_ros.init([s for s in ecto_argv if not s.startswith('__name:=')], args.node_name, False)
 
+    if args.action_name and args.action_name != '""':
+        rospy.loginfo('ORK action started with name: %s' % args.action_name)
+    else:
+        rospy.loginfo('ORK action started with name: recognize_objects')
+
     # add ecto options
     scheduler_options(parser)
     ork_params, _args = read_arguments(args)
     rospy.init_node('recognize_objects_server', argv=ros_argv)
-    server = RecognitionServer(ork_params)
+    server = RecognitionServer(ork_params,args.action_name)
     rospy.spin()

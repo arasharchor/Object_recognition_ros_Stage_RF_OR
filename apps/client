@@ -46,10 +46,14 @@ def on_result(status, result):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Client that queries the ORK server and prints the output. '
                                      'Start your server and launch that file for testing.')
+    parser.add_argument('--OrkSrvName', default='recognize_objects', help='The name of the service of the ORK Srv you want to call. Default = \'recognize_object\'')
+    parser.add_argument('--linemod', action='store_const', const='linemod_recognize_objects', dest='OrkSrvName' , help='If enable, set the name service call to \'linemod_recognize_objects\'')
+    parser.add_argument('--tabletop', action='store_const', const='tabletop_recognize_objects', dest='OrkSrvName' , help='If enable, set the name service call to \'tabletop_recognize_objects\'')
     args = parser.parse_args(args=rospy.myargv(argv=sys.argv)[1:])
 
     rospy.init_node('recognition_client')
-    client = actionlib.SimpleActionClient('recognize_objects', ObjectRecognitionAction)
+    rospy.loginfo('ActionSrv = %s' % args.OrkSrvName)
+    client = actionlib.SimpleActionClient(args.OrkSrvName, ObjectRecognitionAction)
     client.wait_for_server()
 
     start = rospy.Time.now()  # for checking the round trip time.
